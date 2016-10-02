@@ -19,6 +19,7 @@
 #define DEBUG 0
 
 #define CHILD_ID 1
+#define CHILD_ID_BATTERY 2
 #define MOTION_INPUT_PIN 3
 #define BATTERY_REPORT_DAY 1   // Desired heartbeat(battery report) interval when inactive. 
 #define BATTERY_REPORT_BY_IRT_CYCLE 30 // Make a battery report after this many trips. Maximum report interval will also be equal to this number of days.
@@ -45,6 +46,7 @@ bool interruptReturn = false; // "false" will make the first loop disregard high
 Vcc vcc;
 MySensor gw;
 MyMessage msg(CHILD_ID, V_TRIPPED);
+MyMessage voltage_msg(CHILD_ID_BATTERY, V_VOLTAGE);
 
 void setup()  
 {  
@@ -59,6 +61,7 @@ void setup()
 
   gw.sendSketchInfo("Motion sensor", "06092016 v1.0");
   gw.present(CHILD_ID, S_MOTION);
+  gw.present(CHILD_ID_BATTERY, S_MULTIMETER);
 
   DEBUG_PRINTLN("Warming and blocking PIR trip for 20s.");
   gw.sleep(20000); // Wait until HC-505 warmed-up and output returned low.
@@ -67,7 +70,9 @@ void setup()
 void loop() 
 {
   if (interruptReturn) {    // Woke up by rising pin
-    gw.send(msg.set("1"));  // Just send trip (set) commands to controller. (Let controller reset and decide what to do with it.)
+    gw.send(msg.set("1"));  // Just send trip (set) commands to controller.
+    gw.wait(50);
+    gw.send(msg.set("0"));  // Send the off command right after
     irtCounter++;
     if (irtCounter>=BATTERY_REPORT_BY_IRT_CYCLE) {
         irtCounter=0;
@@ -85,13 +90,15 @@ void loop()
   gw.sleep(3000);  // Make sure everything is stable before start to sleep with interrupts. (don't use "gw.wait()" here). Tests shows false trip ~2s after battery report otherwise.
 
   // Sleep until interrupt comes in on motion sensor or sleep time passed.
-  interruptReturn = gw.sleep(MOTION_INPUT_PIN-2,RISING, ONE_DAY_SLEEP_TIME);
+  interruptReturn = gw.sleep(MOTION_INPUT_PIN-2, RISING, ONE_DAY_SLEEP_TIME);
   // DEBUG_PRINT("interruptReturn: ");DEBUG_PRINTLN(interruptReturn);
 
 } 
 
 void sendBatteryReport() {
           float p = vcc.Read_Perc(VCC_MIN, VCC_MAX, true);
+          float v = vcc.Read_Volts();
           int batteryPcnt = static_cast<int>(p);
           gw.sendBatteryLevel(batteryPcnt);
+          gw.send(voltage_msg.set(v,3));
 }
