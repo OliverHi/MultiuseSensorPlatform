@@ -42,6 +42,8 @@ void setup()
 
 void loop()
 {
+  gw.wait(50); // "debouncing"
+  
   // check if the door/button is open or closed
   if (digitalRead(BUTTON_PIN) == HIGH) {
     gw.send(msg.set("1")); // door open / button pressed
