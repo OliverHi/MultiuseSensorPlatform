@@ -4,6 +4,9 @@ Based on https://github.com/mfalkvidd/arduino-plantmoisture
 This sketch uses the soilmoisture "forks" only that are found on ebay. They are connected between 2 analog pins where one gets pulled low and the other one measures.
 The pins are switched every time to avoid corrosion. Between readings the sensos sleeps to preserve batterylife.
 
+By Oliver Hilsky
+Documentation: http://forum.mysensors.org...
+
 21.06.2016 V1.0 Base sketch
 */
 
