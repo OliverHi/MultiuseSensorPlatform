@@ -14,6 +14,7 @@
 #define MY_SIGNING_SOFT // Enables software signing
 #define MY_SIGNING_REQUEST_SIGNATURES // Always request signing from gateway
 #define MY_SIGNING_SOFT_RANDOMSEED_PIN 7 // floating pin for randomness
+#define MY_SIGNING_NODE_WHITELISTING {{.nodeId = GATEWAY_ADDRESS,.serial = {0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01}}} // gateway addres if you want to use whitelisting (node only works with messages from this one gateway)
 
 #include <SPI.h>
 #include <MyConfig.h>
@@ -27,7 +28,7 @@
 #define BATTERY_REPORT_DAY 1   // Desired heartbeat(battery report) interval when inactive. 
 #define BATTERY_REPORT_BY_IRT_CYCLE 30 // Make a battery report after this many trips. Maximum report interval will also be equal to this number of days.
 #define ONE_DAY_SLEEP_TIME 86400000
-#define VCC_MIN 1.9
+#define VCC_MIN 1.8
 #define VCC_MAX 3.3
 
 int dayCounter = BATTERY_REPORT_DAY;
@@ -35,7 +36,7 @@ int irtCounter = 0;
 
 bool interruptReturn = false; // "false" will make the first loop disregard high output from HV-505 (from start-up) and make a battery report instead.
  
-Vcc vcc;
+Vcc vcc(1.0);
 MyMessage msg(CHILD_ID, V_TRIPPED);
 MyMessage voltage_msg(CHILD_ID_BATTERY, V_VOLTAGE);
 

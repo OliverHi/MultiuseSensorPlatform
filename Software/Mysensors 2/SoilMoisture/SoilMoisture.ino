@@ -18,6 +18,7 @@ Documentation: http://forum.mysensors.org...
 #define MY_SIGNING_SOFT // Enables software signing
 #define MY_SIGNING_REQUEST_SIGNATURES // Always request signing from gateway
 #define MY_SIGNING_SOFT_RANDOMSEED_PIN 7 // floating pin for randomness
+#define MY_SIGNING_NODE_WHITELISTING {{.nodeId = GATEWAY_ADDRESS,.serial = {0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01}}} // gateway addres if you want to use whitelisting (node only works with messages from this one gateway)
 
 #include <SPI.h>
 #include <MyConfig.h>
@@ -32,13 +33,13 @@ Documentation: http://forum.mysensors.org...
 #define SLEEP_TIME 1800000 // Sleep time between reads (in milliseconds) - 30 minutes
 #define THRESHOLD 1.2 // Only make a new reading with reverse polarity if the change is larger than 10%.
 #define STABILIZATION_TIME 500 // Let the sensor stabilize before reading
-#define BATTERY_FULL 3000 // 2xAA usually give 3.143V when full
-#define BATTERY_ZERO 1800 // 2.34V limit for 328p at 8MHz. 1.9V, limit for nrf24l01 without step-up. 2.8V limit for Atmega328 with default BOD settings.
+#define BATTERY_FULL 3.3 // 2xAA usually give 3.143V when full
+#define BATTERY_ZERO 1.8 // 2.34V limit for 328p at 8MHz. 1.9V, limit for nrf24l01 without step-up. 2.8V limit for Atmega328 with default BOD settings.
 const int SENSOR_ANALOG_PINS[] = {A1, A2}; // Sensor is connected to these two pins. Avoid A3 if using ATSHA204. A6 and A7 cannot be used because they don't have pullups.
 
 MyMessage msg(CHILD_ID_MOISTURE, V_HUM);
 MyMessage voltage_msg(CHILD_ID_BATTERY, V_VOLTAGE);
-Vcc vcc;
+Vcc vcc(1.0);
 float oldvoltage = 0;
 byte direction = 0;
 int oldMoistureLevel = -1;

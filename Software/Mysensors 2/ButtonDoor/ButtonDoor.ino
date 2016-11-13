@@ -15,6 +15,7 @@ Documentation: http://forum.mysensors.org...
 #define MY_SIGNING_SOFT // Enables software signing
 #define MY_SIGNING_REQUEST_SIGNATURES // Always request signing from gateway
 #define MY_SIGNING_SOFT_RANDOMSEED_PIN 7 // floating pin for randomness
+#define MY_SIGNING_NODE_WHITELISTING {{.nodeId = GATEWAY_ADDRESS,.serial = {0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01}}} // gateway addres if you want to use whitelisting (node only works with messages from this one gateway)
 
 #include <SPI.h>
 #include <MyConfig.h>
@@ -27,13 +28,13 @@ Documentation: http://forum.mysensors.org...
 #define CHILD_ID_BUTTON     0
 #define CHILD_ID_BATTERY    1
 #define BUTTON_PIN          2         // Digital interrupt pin 0
-#define BATTERY_FULL        3000      // 2xAA usually give 3.143V when full
-#define BATTERY_ZERO        1800      // 2.34V limit for 328p at 8MHz. 1.9V, limit for nrf24l01 without step-up. 2.8V limit for Atmega328 with default BOD settings.
+#define BATTERY_FULL        3.3      // 2xAA usually give 3.143V when full
+#define BATTERY_ZERO        1.8      // 2.34V limit for 328p at 8MHz. 1.9V, limit for nrf24l01 without step-up. 2.8V limit for Atmega328 with default BOD settings.
 #define ONE_DAY_SLEEP_TIME  86400000  // report battery status each day at least once
 
 MyMessage msg(CHILD_ID_BUTTON, V_TRIPPED);
 MyMessage voltage_msg(CHILD_ID_BATTERY, V_VOLTAGE);
-Vcc vcc;
+Vcc vcc(1.0);
 float oldvoltage = 0;
 
 void before()
