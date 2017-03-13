@@ -1,7 +1,7 @@
 /*
 This sketch can be used with buttons or door/windows contact sensors (or anything binary)
 
-By Oliver Hilsk
+By Oliver Hilsky
 Documentation: http://forum.mysensors.org...
 
 27.10.2016 1.0 Base sketch
