@@ -10,12 +10,12 @@ Version 2 13.11.2016 updated to Mysensors V2
 // library settings
 #define MY_RADIO_NRF24
 #define MY_DEBUG    // Enables debug messages in the serial log
-#define MY_DEBUG_VERBOSE_SIGNING //!< Enable signing related debug prints to serial monitor
+//#define MY_DEBUG_VERBOSE_SIGNING //!< Enable signing related debug prints to serial monitor
 #define MY_BAUD_RATE  9600 // Sets the serial baud rate for console and serial gateway
-#define MY_SIGNING_SOFT // Enables software signing
-#define MY_SIGNING_REQUEST_SIGNATURES // Always request signing from gateway
-#define MY_SIGNING_SOFT_RANDOMSEED_PIN 7 // floating pin for randomness
-#define MY_SIGNING_NODE_WHITELISTING {{.nodeId = GATEWAY_ADDRESS,.serial = {0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01}}} // gateway addres if you want to use whitelisting (node only works with messages from this one gateway)
+//#define MY_SIGNING_SOFT // Enables software signing
+//#define MY_SIGNING_REQUEST_SIGNATURES // Always request signing from gateway
+//#define MY_SIGNING_SOFT_RANDOMSEED_PIN 7 // floating pin for randomness
+//#define MY_SIGNING_NODE_WHITELISTING {{.nodeId = GATEWAY_ADDRESS,.serial = {...}}} // gateway addres if you want to use whitelisting (node only works with messages from this one gateway)
 
 #include <SPI.h>
 #include <Wire.h>
@@ -31,10 +31,10 @@ Version 2 13.11.2016 updated to Mysensors V2
 #define CHILD_ID_BATTERY 2
 // #define SLEEP_TIME 15000 // 15s for DEBUG
 #define SLEEP_TIME 300000   // 5 min
-#define FORCE_TRANSMIT_CYCLE 36  // 5min*12=1/hour, 5min*36=1/3hour 
+#define FORCE_TRANSMIT_CYCLE 36  // 5min*12=1 time per hour, 5min*36=1 time per 3hour 
 #define BATTERY_REPORT_CYCLE 2016   // Once per 5min   =>   12*24*7 = 2016 (one report/week)
 #define BATTERY_ZERO 1.8
-#define BATTERY_FULL 3.3
+#define BATTERY_FULL 3.0
 #define HUMI_TRANSMIT_THRESHOLD 3.0  // THRESHOLD tells how much the value should have changed since last time it was transmitted.
 #define TEMP_TRANSMIT_THRESHOLD 0.5
 #define AVERAGES 2
@@ -58,7 +58,7 @@ void before() {
 }
 
 void presentation() {  
-  sendSketchInfo("TempHum", "2.0 17052016"); 
+  sendSketchInfo("TempHum", "2.0 04022017"); 
   present(CHILD_ID_TEMP, S_TEMP);   // Present sensor to controller
   present(CHILD_ID_HUM, S_HUM);
   present(CHILD_ID_BATTERY, S_CUSTOM);

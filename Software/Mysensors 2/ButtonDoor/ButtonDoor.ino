@@ -6,16 +6,18 @@ Documentation: http://forum.mysensors.org...
 
 27.10.2016 1.0 Base sketch
 12.11.2016 2.0 Upgrade to mysensors 2.0
+10.ß2.2017 3.0 disabled pullup, added external resistor
 */
 
 // library settings
 #define MY_RADIO_NRF24
-//#define MY_DEBUG    // Enables debug messages in the serial log
+#define MY_DEBUG    // Enables debug messages in the serial log
 #define MY_BAUD_RATE  9600 // Sets the serial baud rate for console and serial gateway
-#define MY_SIGNING_SOFT // Enables software signing
-#define MY_SIGNING_REQUEST_SIGNATURES // Always request signing from gateway
-#define MY_SIGNING_SOFT_RANDOMSEED_PIN 7 // floating pin for randomness
-#define MY_SIGNING_NODE_WHITELISTING {{.nodeId = GATEWAY_ADDRESS,.serial = {0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01,0x01}}} // gateway addres if you want to use whitelisting (node only works with messages from this one gateway)
+//#define MY_SIGNING_SOFT // Enables software signing
+//#define MY_SIGNING_REQUEST_SIGNATURES // Always request signing from gateway
+//#define MY_SIGNING_SOFT_RANDOMSEED_PIN 7 // floating pin for randomness
+//#define MY_SIGNING_NODE_WHITELISTING {{.nodeId = GATEWAY_ADDRESS,.serial = {...}}} // gateway addres if you want to use whitelisting (node only works with messages from this one gateway)
+//#define MY_NODE_ID 26
 
 #include <SPI.h>
 #include <MyConfig.h>
@@ -28,7 +30,7 @@ Documentation: http://forum.mysensors.org...
 #define CHILD_ID_BUTTON     0
 #define CHILD_ID_BATTERY    1
 #define BUTTON_PIN          2         // Digital interrupt pin 0
-#define BATTERY_FULL        3.3      // 2xAA usually give 3.143V when full
+#define BATTERY_FULL        3.0      // 2xAA usually give 3.143V when full
 #define BATTERY_ZERO        1.8      // 2.34V limit for 328p at 8MHz. 1.9V, limit for nrf24l01 without step-up. 2.8V limit for Atmega328 with default BOD settings.
 #define ONE_DAY_SLEEP_TIME  86400000  // report battery status each day at least once
 
@@ -41,12 +43,12 @@ void before()
 {
   // Setup the button
   pinMode(BUTTON_PIN,INPUT);
-  // Activate internal pull-up
-  digitalWrite(BUTTON_PIN,HIGH);
+  // Activate internal pull-up or (even better) use external pullup/down resistor
+  //digitalWrite(BUTTON_PIN,HIGH);
 }
 
 void presentation() {
-  sendSketchInfo("Door sensor w bat", "2.0 12112016");
+  sendSketchInfo("Button sensor", "2.0 19122016");
 
   present(CHILD_ID_BUTTON, S_DOOR);
   delay(250);
@@ -58,10 +60,10 @@ void loop()
   wait(30); // "debouncing"
   
   // check if the door/button is open or closed
-  if (digitalRead(BUTTON_PIN) == HIGH) {
+  if (digitalRead(BUTTON_PIN) == LOW) {
     send(msg.set("1")); // door open / button pressed
   } else {
-    send(msg.set("0")); // door closed / button not pressed
+    //send(msg.set("0")); // door closed / button not pressed
   }
 
   // get voltage
@@ -75,6 +77,9 @@ void loop()
     oldvoltage = voltage;
   }
 
+  // sleep so it doesnt get pressed right away again
+  sleep(250);
+
   // sleep to conserve energy
-  sleep(BUTTON_PIN-2, CHANGE, ONE_DAY_SLEEP_TIME);
+  sleep(BUTTON_PIN-2, FALLING, ONE_DAY_SLEEP_TIME);
 }
